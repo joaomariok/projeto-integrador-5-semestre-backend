@@ -1,15 +1,14 @@
-const { sleep } = require("./helper");
-const database = require('.');
-const md5 = require("md5");
-
 // Import models
 const Paciente = require('../models/paciente');
 const Atendimento = require('../models/atendimento');
 const Prontuario = require('../models/prontuario');
 const Usuario = require("../models/usuario");
 const dummyData = require("./dummydata");
-// const keys = require("./keys");
-// const env = require("./env");
+const keys = require("./keys");
+const env = require("./env");
+const { sleep } = require("./helper");
+const database = require('.');
+const md5 = require("md5");
 
 // Constants
 const RETRY_CONNECTION_TIMER = 10 * 1e3;
@@ -28,79 +27,79 @@ async function isDatabaseConnected() {
     return isConnected;
 }
 
-// async function createRootUser() {
-//     console.log(env.ROOT_USERNAME);
-//     const userInDatabase = await Usuario.findOne({
-//         where: {
-//             username: env.ROOT_USERNAME,
-//         }
-//     });
+async function createRootUser() {
+    console.log(env.ROOT_USERNAME);
+    const userInDatabase = await Usuario.findOne({
+        where: {
+            username: env.ROOT_USERNAME,
+        }
+    });
 
-//     if (Boolean(userInDatabase)) return;
+    if (Boolean(userInDatabase)) return;
 
-//     const rootUser = await Usuario.create({
-//         username: env.ROOT_USERNAME,
-//         password: md5(env.ROOT_PASSWORD),
-//     });
-// }
+    const rootUser = await Usuario.create({
+        username: env.ROOT_USERNAME,
+        password: md5(env.ROOT_PASSWORD),
+    });
+}
 
-// async function createDummyEntry(_paciente, _prontuario, _atendimento) {
-//     const paciente = await Paciente.create({
-//         idade: _paciente.idade,
-//         genero: _paciente.genero,
-//         multiplicidade: _paciente.multiplicidade
-//     });
+async function createDummyEntry(_paciente, _prontuario, _atendimento) {
+    const paciente = await Paciente.create({
+        idade: _paciente.idade,
+        genero: _paciente.genero,
+        multiplicidade: _paciente.multiplicidade
+    });
 
-//     const prontuario = await Prontuario.create({
-//         paciente_id: paciente.id,
-//         sintomas: _prontuario.sintomas,
-//         veioAObito: _prontuario.veioAObito,
-//         transferencia: _prontuario.transferencia,
-//         gravidade: _prontuario.gravidade,
-//         vacinadoCovid: _prontuario.vacinadoCovid,
-//         possuiComorbidades: _prontuario.possuiComorbidades
-//     });
+    const prontuario = await Prontuario.create({
+        paciente_id: paciente.id,
+        sintomas: _prontuario.sintomas,
+        veioAObito: _prontuario.veioAObito,
+        transferencia: _prontuario.transferencia,
+        gravidade: _prontuario.gravidade,
+        vacinadoCovid: _prontuario.vacinadoCovid,
+        possuiComorbidades: _prontuario.possuiComorbidades
+    });
 
-//     const atendimento = Atendimento.create({
-//         horaEntrada: _atendimento.horaEntrada.replace("T", " "),
-//         horaSaida: _atendimento.horaSaida.replace("T", " "),
-//         paciente_id: paciente.id,
-//         prontuario_id: prontuario.id
-//     });
-// }
+    const atendimento = Atendimento.create({
+        horaEntrada: _atendimento.horaEntrada.replace("T", " "),
+        horaSaida: _atendimento.horaSaida.replace("T", " "),
+        paciente_id: paciente.id,
+        prontuario_id: prontuario.id
+    });
+}
 
-// async function createDummyData() {
-//     dummyData.forEach(async (registro, index) => {
-//         console.log(`[DB] Creating dummy entry ${index + 1}/${dummyData.length}`);
-//         await createDummyEntry(registro.paciente, registro.prontuario, registro.atendimento);
-//     });
-// }
+async function createDummyData() {
+    dummyData.forEach(async (registro, index) => {
+        console.log(`[DB] Creating dummy entry ${index + 1}/${dummyData.length}`);
+        await createDummyEntry(registro.paciente, registro.prontuario, registro.atendimento);
+    });
+}
 
 // Connection to database
-// async function trySyncDatabase() {
-//     try {
-//         const resultado = await database.sync({ force: keys.isDebug });
-//         console.log("[DB] Database synchronized!");
-//         console.log(resultado.models);
-//     } catch (err) {
-//         console.log(err);
-//     }
-// }
+async function trySyncDatabase() {
+    try {
+        const resultado = await database.sync({ force: keys.isDebug });
+        console.log("[DB] Database synchronized!");
+        console.log(resultado.models);
+    } catch (err) {
+        console.log(err);
+    }
+}
 
 async function tryDatabaseConnection() {
     for (retryNumber = 0; retryNumber < MAX_CONNECTION_RETRY_COUNT; retryNumber++) {
         try {
             await database.authenticate();
             console.log("[DB] Connected to database!");
-            // await trySyncDatabase();
+            await trySyncDatabase();
             isConnected = true;
-            // await createRootUser();
+            await createRootUser();
 
-            // if (keys.isDebug) {
-            //     console.log("[DB] Creating dummy data");
-            //     await createDummyData();
-            //     console.log("[DB] Finished creating dummy data");
-            // }
+            if (keys.isDebug) {
+                console.log("[DB] Creating dummy data");
+                await createDummyData();
+                console.log("[DB] Finished creating dummy data");
+            }
         } catch (err) {
             console.log(`[DB] Retrying connection to database: ${retryNumber}/${MAX_CONNECTION_RETRY_COUNT}`);
             console.log(process.env.DB_HOST)
@@ -114,5 +113,4 @@ async function tryDatabaseConnection() {
     }
 }
 
-// module.exports = { isDatabaseConnected, tryDatabaseConnection, createDummyData };
-module.exports = { isDatabaseConnected, tryDatabaseConnection };
+module.exports = { isDatabaseConnected, tryDatabaseConnection, createDummyData };
