@@ -3,6 +3,7 @@ const express = require("express");
 const cors = require("cors");
 
 const { router } = require("./routes");
+const port = process.env.port || 5000
 
 // Database imports
 const { tryDatabaseConnection } = require('./database/connection');
@@ -19,6 +20,6 @@ app.use(router);
 (tryDatabaseConnection)();
 
 // Listen on port
-app.listen(5000, (err) => {
-    console.log("Listening on port 5000");
+app.listen(port,  (err) => {
+    console.log(`Listening on port ${port}`);
 });
