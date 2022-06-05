@@ -1,3 +1,7 @@
+const { sleep } = require("./helper");
+const database = require('.');
+const md5 = require("md5");
+
 // Import models
 const Paciente = require('../models/paciente');
 const Atendimento = require('../models/atendimento');
@@ -6,13 +10,10 @@ const Usuario = require("../models/usuario");
 const dummyData = require("./dummydata");
 const keys = require("./keys");
 const env = require("./env");
-const { sleep } = require("./helper");
-const database = require('.');
-const md5 = require("md5");
 
 // Constants
 const RETRY_CONNECTION_TIMER = 10 * 1e3;
-const MAX_CONNECTION_RETRY_COUNT = 3;
+const MAX_CONNECTION_RETRY_COUNT = 100;
 
 let isConnected = false;
 
@@ -78,7 +79,8 @@ async function createDummyData() {
 // Connection to database
 async function trySyncDatabase() {
     try {
-        const resultado = await database.sync({ force: keys.isDebug });
+        // const resultado = await database.sync({ force: keys.isDebug });
+        const resultado = await database.sync();
         console.log("[DB] Database synchronized!");
         console.log(resultado.models);
     } catch (err) {
@@ -95,18 +97,15 @@ async function tryDatabaseConnection() {
             isConnected = true;
             await createRootUser();
 
-            if (keys.isDebug) {
-                console.log("[DB] Creating dummy data");
-                await createDummyData();
-                console.log("[DB] Finished creating dummy data");
-            }
+            // if (keys.isDebug) {
+            //     console.log("[DB] Creating dummy data");
+            //     await createDummyData();
+            //     console.log("[DB] Finished creating dummy data");
+            // }
+
+            break;
         } catch (err) {
             console.log(`[DB] Retrying connection to database: ${retryNumber}/${MAX_CONNECTION_RETRY_COUNT}`);
-            console.log(process.env.DB_HOST)
-            console.log(process.env.DB_NAME)
-            console.log(process.env.DB_PASS)
-            console.log(process.env.DB_USER)
-            console.log(process.env.DB_PORT)
             console.log(err.parent);
             await sleep(RETRY_CONNECTION_TIMER);
         }

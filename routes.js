@@ -1,10 +1,10 @@
 const { Router } = require("express");
-const env = require("./database/env");
 const md5 = require("md5");
 const { sign } = require("jsonwebtoken");
 
 const { ensureAuthenticated } = require("./middleware/ensureAuthenticated");
-const { isDatabaseConnected } = require('./database/connection');
+const { isDatabaseConnected, createDummyData } = require('./database/connection');
+const env = require("./database/env");
 
 // Import models
 const database = require('./database');
@@ -17,10 +17,9 @@ const router = Router();
 
 // ==== Database routes ====
 
-router.get('/', async (req, res) =>{
-  res.json({ 'res': 'ta funcionando'})
-})
-
+router.get('/', async (req, res) => {
+  res.status(200).json({ 'res': 'funcionando'});
+});
 
 router.get("/tables", ensureAuthenticated, async (req, res) => {
   if (!isDatabaseConnected()) return res.status(502).json();
@@ -34,6 +33,9 @@ router.get("/tables", ensureAuthenticated, async (req, res) => {
 });
 
 router.get("/is-database-connected", ensureAuthenticated, async (req, res) => {
+  console.log("GET /is-database-connected");
+  console.log("DEBUG MODE: " + env.DEBUG);
+
   res.json(await isDatabaseConnected());
 });
 
