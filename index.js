@@ -19,6 +19,7 @@ app.use(router);
 (tryDatabaseConnection)();
 
 // Listen on port
-app.listen(5000, (err) => {
-    console.log("Listening on port 5000");
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, (err) => {
+    console.log(`Listening on port ${PORT}`);
 });
