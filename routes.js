@@ -17,6 +17,10 @@ const router = Router();
 
 // ==== Database routes ====
 
+router.get('/', async () =>{
+  return 'Esta tudo funcionando'
+})
+
 router.get("/tables", ensureAuthenticated, async (req, res) => {
   if (!isDatabaseConnected()) return res.status(502).json();
 
