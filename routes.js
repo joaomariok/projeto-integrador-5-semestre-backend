@@ -17,8 +17,8 @@ const router = Router();
 
 // ==== Database routes ====
 
-router.get('/', async () =>{
-  return{  res: 'Esta tudo funcionando'}
+router.get('/', async (req, res) =>{
+  res.json({ 'res': 'ta funcionando'})
 })
 
 
