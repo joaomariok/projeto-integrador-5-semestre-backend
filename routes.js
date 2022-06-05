@@ -1,17 +1,17 @@
 const { Router } = require("express");
-const md5 = require("md5");
-const { sign } = require("jsonwebtoken");
-
-const { ensureAuthenticated } = require("./middleware/ensureAuthenticated");
-const { isDatabaseConnected } = require('./database/connection');
 const env = require("./database/env");
+// const md5 = require("md5");
+// const { sign } = require("jsonwebtoken");
+
+// const { ensureAuthenticated } = require("./middleware/ensureAuthenticated");
+// const { isDatabaseConnected } = require('./database/connection');
 
 // Import models
-const database = require('./database');
-const Paciente = require('./models/paciente');
-const Atendimento = require('./models/atendimento');
-const Prontuario = require('./models/prontuario');
-const Usuario = require("./models/usuario");
+// const database = require('./database');
+// const Paciente = require('./models/paciente');
+// const Atendimento = require('./models/atendimento');
+// const Prontuario = require('./models/prontuario');
+// const Usuario = require("./models/usuario");
 
 const router = Router();
 
@@ -33,9 +33,9 @@ router.get('/', async () =>{
 //   res.json(result);
 // });
 
-router.get("/is-database-connected", ensureAuthenticated, async (req, res) => {
-  res.json(await isDatabaseConnected());
-});
+// router.get("/is-database-connected", ensureAuthenticated, async (req, res) => {
+//   res.json(await isDatabaseConnected());
+// });
 
 // router.post("/create-dummy-data", ensureAuthenticated, async (req, res) => {
 //   if (!isDatabaseConnected()) return res.status(502).json();
