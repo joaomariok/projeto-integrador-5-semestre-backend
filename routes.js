@@ -3,22 +3,22 @@ const md5 = require("md5");
 const { sign } = require("jsonwebtoken");
 
 const { ensureAuthenticated } = require("./middleware/ensureAuthenticated");
-const { isDatabaseConnected, createDummyData } = require('./database/connection');
+const { isDatabaseConnected } = require('./database/connection');
 const env = require("./database/env");
 
 // Import models
-// const database = require('./database');
-// const Paciente = require('./models/paciente');
-// const Atendimento = require('./models/atendimento');
-// const Prontuario = require('./models/prontuario');
-// const Usuario = require("./models/usuario");
+const database = require('./database');
+const Paciente = require('./models/paciente');
+const Atendimento = require('./models/atendimento');
+const Prontuario = require('./models/prontuario');
+const Usuario = require("./models/usuario");
 
 const router = Router();
 
 // ==== Database routes ====
 
 router.get('/', async () =>{
-  return 'Esta tudo funcionando'
+  return{  res: 'Esta tudo funcionando'}
 })
 
 

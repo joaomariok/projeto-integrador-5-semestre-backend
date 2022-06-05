@@ -114,4 +114,5 @@ async function tryDatabaseConnection() {
     }
 }
 
-module.exports = { isDatabaseConnected, tryDatabaseConnection, createDummyData };
+// module.exports = { isDatabaseConnected, tryDatabaseConnection, createDummyData };
+module.exports = { isDatabaseConnected, tryDatabaseConnection };
