@@ -17,7 +17,7 @@ const router = Router();
 
 // ==== Database routes ====
 
-router.get("/tables", ensureAuthenticated, async (req, res) => {
+router.get("/tables", async (req, res) => {
   if (!isDatabaseConnected()) return res.status(502).json();
 
   console.log("GET /tables");
@@ -28,7 +28,7 @@ router.get("/tables", ensureAuthenticated, async (req, res) => {
   res.json(result);
 });
 
-router.get("/is-database-connected", ensureAuthenticated, async (req, res) => {
+router.get("/is-database-connected", async (req, res) => {
   console.log("GET /is-database-connected");
   console.log("DEBUG MODE: " + env.DEBUG);
 
@@ -92,7 +92,7 @@ router.post("/new-record", ensureAuthenticated, async (req, res) => {
   res.status(200).json();
 });
 
-router.get("/permanence", ensureAuthenticated, async (req, res) => {
+router.get("/permanence", async (req, res) => {
   if (!isDatabaseConnected()) return res.status(502).json();
 
   console.log("GET /permanence");
@@ -117,7 +117,7 @@ router.get("/permanence", ensureAuthenticated, async (req, res) => {
   res.status(200).json(data);
 });
 
-router.get("/severity-and-permanence", ensureAuthenticated, async (req, res) => {
+router.get("/severity-and-permanence", async (req, res) => {
   if (!isDatabaseConnected()) return res.status(502).json();
 
   console.log("GET /severity-and-permanence");
