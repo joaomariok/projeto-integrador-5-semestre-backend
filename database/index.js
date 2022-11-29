@@ -7,7 +7,10 @@ const database = new Sequelize(
     keys.mysqlPass,
     {
         dialect: 'postgres',
-        host: keys.mysqlHost
+        dialectOptions: {
+            ssl: true
+        },
+        host: keys.mysqlHost,
     }
 );
 

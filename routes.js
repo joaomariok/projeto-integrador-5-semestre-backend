@@ -18,6 +18,8 @@ const router = Router();
 // ==== Database routes ====
 
 router.get("/tables", async (req, res) => {
+  return res.status(403).json();
+
   if (!isDatabaseConnected()) return res.status(502).json();
 
   console.log("GET /tables");
@@ -100,21 +102,50 @@ router.get("/permanence", async (req, res) => {
   // const query = "SELECT TIMESTAMPDIFF(MINUTE, horaEntrada, horaSaida) AS permanencia FROM atendimentos AS atendimento"
   // const [ data, temp ] = await database.query(query);
 
-  const data = await Atendimento.findAll({
+  const dataEntrada = await Atendimento.findAll({
     attributes: [
       [
-        database.fn(
-          'TIMESTAMPDIFF',
-          database.literal('MINUTE'),
-          database.col('horaEntrada'),
-          database.col('horaSaida'),
-        ),
+        database.col('horaEntrada'),
         'permanencia'
       ]
     ]
   });
 
-  res.status(200).json(data);
+  const dataSaida = await Atendimento.findAll({
+    attributes: [
+      [
+        database.col('horaSaida'),
+        'permanencia'
+      ]
+    ]
+  });
+
+  const dataEntradaMs = dataEntrada.map(d => Date.parse(d.dataValues.permanencia));
+  const dataSaidaMs = dataSaida.map(d => Date.parse(d.dataValues.permanencia));
+  const timeDiff = []
+
+  for (let i = 0; i < dataEntradaMs.length; i++) {
+    timeDiff.push({ permanencia: (dataSaidaMs[i] - dataEntradaMs[i]) / (1000 * 60) });
+  }
+
+  console.log(timeDiff);
+  res.status(200).json(timeDiff);
+
+  // const data = await Atendimento.findAll({
+  //   attributes: [
+  //     [
+  //       database.fn(
+  //         'DATEDIFF',
+  //         database.literal('MINUTE'),
+  //         database.col('horaEntrada'),
+  //         database.col('horaSaida'),
+  //       ),
+  //       'permanencia'
+  //     ]
+  //   ]
+  // });
+
+  // res.status(200).json(data);
 });
 
 router.get("/severity-and-permanence", async (req, res) => {
@@ -129,10 +160,24 @@ router.get("/severity-and-permanence", async (req, res) => {
   // INNER JOIN prontuarios
   // ON atendimentos.prontuario_id = prontuarios.id
 
-  const query = "SELECT TIMESTAMPDIFF(MINUTE, atendimentos.horaEntrada, atendimentos.horaSaida) AS permanencia, prontuarios.gravidade AS gravidade FROM atendimentos INNER JOIN prontuarios ON atendimentos.prontuario_id = prontuarios.id"
+  // const query = "SELECT TIMESTAMPDIFF(MINUTE, atendimentos.horaEntrada, atendimentos.horaSaida) AS permanencia, prontuarios.gravidade AS gravidade FROM atendimentos INNER JOIN prontuarios ON atendimentos.prontuario_id = prontuarios.id"
+  const query = "SELECT * FROM atendimentos INNER JOIN prontuarios ON atendimentos.prontuario_id = prontuarios.id"
   const [data, temp] = await database.query(query);
 
-  res.status(200).json(data);
+  const dataEntradaMs = data.map(d => Date.parse(d.horaEntrada));
+  const dataSaidaMs = data.map(d => Date.parse(d.horaSaida));
+  const dataGravidade = data.map(d => d.gravidade);
+  const returnData = []
+
+  for (let i = 0; i < dataEntradaMs.length; i++) {
+    returnData.push({
+      permanencia: (dataSaidaMs[i] - dataEntradaMs[i]) / (1000 * 60),
+      gravidade: dataGravidade[i]
+    });
+  }
+  console.log(returnData);
+
+  res.status(200).json(returnData);
 });
 
 // ==== Login routes ====
@@ -214,7 +259,7 @@ router.post("/login", async (req, res) => {
       id: userInDatabase.id,
       user: userInDatabase.username,
     },
-    env.JWT_SECRET,
+    '40847951488f9395f242f30ed27cdc47',//env.JWT_SECRET,
     {
       subject: userInDatabase.username,
       expiresIn: userInDatabase != env.ROOT_USERNAME ? "1d" : "10m",
