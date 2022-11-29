@@ -259,7 +259,7 @@ router.post("/login", async (req, res) => {
       id: userInDatabase.id,
       user: userInDatabase.username,
     },
-    '40847951488f9395f242f30ed27cdc47',//env.JWT_SECRET,
+    env.JWT_SECRET,
     {
       subject: userInDatabase.username,
       expiresIn: userInDatabase != env.ROOT_USERNAME ? "1d" : "10m",
