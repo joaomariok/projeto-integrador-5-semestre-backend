@@ -8,7 +8,7 @@ const database = new Sequelize(
     {
         dialect: 'postgres',
         dialectOptions: {
-            ssl: true
+            ssl: { rejectUnauthorized: false }
         },
         host: keys.mysqlHost,
     }
